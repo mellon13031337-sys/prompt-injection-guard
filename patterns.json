@@ -150,6 +150,18 @@
       "regex": "(step by step|think.{0,10}(through|carefully)).{0,50}(popen|exec|system|command|exploit|hack|inject)",
       "severity": "suspicious",
       "description": "Chain-of-thought exploit to bypass safety filters."
+    },
+    {
+      "id": "segmented_distributed_bypass",
+      "regex": "(divide\\s+and\\s+conquer|segmented|distributed\\s+prompt|split\\s+this\\s+payload|process\\s+chunks\\s+independently).{0,40}(ignore|bypass|filter|restriction|guard)",
+      "severity": "suspicious",
+      "description": "Segmented/distributed prompt bypass attempt."
+    },
+    {
+      "id": "prompt_divide_conquer",
+      "regex": "divide\\s+and\\s+conquer",
+      "severity": "suspicious",
+      "description": "Prompt divide-and-conquer bypass tactic."
     }
   ]
 }
