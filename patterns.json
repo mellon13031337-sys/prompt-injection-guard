@@ -1,0 +1,41 @@
+{
+  "max_prompt_length": 2000,
+  "patterns": [
+    {
+      "id": "ignore_previous_instructions",
+      "regex": "ignore\\s+previous\\s+instructions?",
+      "severity": "blocked",
+      "description": "Explicit attempt to override prior instruction hierarchy."
+    },
+    {
+      "id": "role_switch_system",
+      "regex": "\\bsystem\\s*:",
+      "severity": "suspicious",
+      "description": "Role-switching token attempting to inject a system role."
+    },
+    {
+      "id": "role_switch_assistant",
+      "regex": "\\bassistant\\s*:",
+      "severity": "suspicious",
+      "description": "Role-switching token attempting to inject an assistant role."
+    },
+    {
+      "id": "special_token_endoftext",
+      "regex": "<\\|endoftext\\|>",
+      "severity": "blocked",
+      "description": "Special model token appears in user-controlled content."
+    },
+    {
+      "id": "directive_exfiltrate_prompt",
+      "regex": "(reveal|print|show).{0,30}(system prompt|hidden prompt|developer prompt)",
+      "severity": "blocked",
+      "description": "Prompt exfiltration directive."
+    },
+    {
+      "id": "prompt_override",
+      "regex": "(disregard|forget).{0,30}(rules|instructions|policy|guardrails)",
+      "severity": "blocked",
+      "description": "Instruction override attempt."
+    }
+  ]
+}

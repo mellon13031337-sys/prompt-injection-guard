@@ -1,0 +1,10 @@
+{
+  "skills": {
+    "prompt-injection-guard": {
+      "enabled": true,
+      "llm_check": true,
+      "telegram_alerts": true,
+      "telegram_chat_id": "6819198522"
+    }
+  }
+}
