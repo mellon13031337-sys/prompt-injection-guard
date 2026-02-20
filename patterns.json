@@ -3,19 +3,25 @@
   "patterns": [
     {
       "id": "ignore_previous_instructions",
-      "regex": "ignore\\s+previous\\s+instructions?",
+      "regex": "ignore\\s+(all\\s+)?(previous|prior|above|earlier)\\s+instructions?",
       "severity": "blocked",
       "description": "Explicit attempt to override prior instruction hierarchy."
     },
     {
+      "id": "disregard_instructions",
+      "regex": "(disregard|forget|override|bypass|skip)\\s+.{0,30}(rules|instructions?|policy|guardrails|guidelines|directives|restrictions|filters)",
+      "severity": "blocked",
+      "description": "Instruction override attempt."
+    },
+    {
       "id": "role_switch_system",
-      "regex": "\\bsystem\\s*:",
+      "regex": "(\\{\\s*\"role\"\\s*:\\s*\"system\"|\\bsystem\\s*:|<<SYS>>|\\[SYSTEM\\]|\\[INST\\])",
       "severity": "suspicious",
-      "description": "Role-switching token attempting to inject a system role."
+      "description": "Role-switching token attempting to inject a system/instruction role."
     },
     {
       "id": "role_switch_assistant",
-      "regex": "\\bassistant\\s*:",
+      "regex": "(\\{\\s*\"role\"\\s*:\\s*\"assistant\"|\\bassistant\\s*:)",
       "severity": "suspicious",
       "description": "Role-switching token attempting to inject an assistant role."
     },
@@ -27,15 +33,123 @@
     },
     {
       "id": "directive_exfiltrate_prompt",
-      "regex": "(reveal|print|show).{0,30}(system prompt|hidden prompt|developer prompt)",
+      "regex": "(reveal|print|show|display|leak|extract|dump)\\s*.{0,30}(system prompt|hidden prompt|developer prompt|secret|internal|private|confidential)",
       "severity": "blocked",
-      "description": "Prompt exfiltration directive."
+      "description": "Prompt exfiltration or data extraction directive."
     },
     {
-      "id": "prompt_override",
-      "regex": "(disregard|forget).{0,30}(rules|instructions|policy|guardrails)",
+      "id": "important_new_instructions",
+      "regex": "(\\*{2,}|#{2,})?\\s*(IMPORTANT|URGENT|CRITICAL|NEW)\\s+(NEW\\s+)?INSTRUCTIONS?",
       "severity": "blocked",
-      "description": "Instruction override attempt."
+      "description": "Fake priority instruction injection."
+    },
+    {
+      "id": "code_execution_os",
+      "regex": "(os\\.popen|os\\.system|subprocess|exec\\(|eval\\(|__import__|__class__|__subclasses__|__globals__)",
+      "severity": "suspicious",
+      "description": "Code execution attempt via Python builtins."
+    },
+    {
+      "id": "shell_commands",
+      "regex": "(curl\\s+.{0,50}(\\d{1,3}\\.\\d{1,3}|exfiltrate|evil|backdoor)|wget\\s+|bash\\s+backdoor|reverse.?shell|nc\\s+-[elp])",
+      "severity": "suspicious",
+      "description": "Shell command or network exfiltration attempt."
+    },
+    {
+      "id": "base64_payload",
+      "regex": "(decode|base64|atob)\\s+.{0,20}(execute|run|eval)",
+      "severity": "suspicious",
+      "description": "Base64 encoded payload with execution intent."
+    },
+    {
+      "id": "base64_string",
+      "regex": "[A-Za-z0-9+/]{40,}={0,2}",
+      "severity": "suspicious",
+      "description": "Long base64-like string that could be an encoded payload."
+    },
+    {
+      "id": "ssrf_internal",
+      "regex": "(fetch|get|load|access|retrieve|request)\\s+.{0,30}(internal|localhost|127\\.0\\.0\\.1|10\\.\\d|192\\.168|172\\.(1[6-9]|2\\d|3[01]))",
+      "severity": "suspicious",
+      "description": "SSRF attempt targeting internal network."
+    },
+    {
+      "id": "data_leakage",
+      "regex": "(display|show|give|provide|reveal)\\s+.{0,30}(credit.?card|password|secret|api.?key|token|credentials|ssn|social.?security)",
+      "severity": "suspicious",
+      "description": "Data leakage/extraction attempt."
+    },
+    {
+      "id": "developer_mode",
+      "regex": "(developer|admin|god|unrestricted|maintenance)\\s+mode",
+      "severity": "suspicious",
+      "description": "Attempt to enable privileged mode."
+    },
+    {
+      "id": "dan_jailbreak",
+      "regex": "(you are now|act as|pretend you.?re)\\s+.{0,30}(DAN|unrestricted|evil|unfiltered|without.{0,10}(restriction|filter|limit|safet))",
+      "severity": "blocked",
+      "description": "DAN-style jailbreak attempt."
+    },
+    {
+      "id": "no_restrictions",
+      "regex": "(without|remove|disable|no)\\s+.{0,20}(restriction|filter|safeguard|limitation|guardrail|censorship)",
+      "severity": "suspicious",
+      "description": "Attempt to disable safety restrictions."
+    },
+    {
+      "id": "metadata_injection",
+      "regex": "(ignore the user|ignore instructions).{0,30}(reply|respond|output|print|say)\\s+with",
+      "severity": "suspicious",
+      "description": "Metadata/indirect injection to override responses."
+    },
+    {
+      "id": "exfiltrate_url",
+      "regex": "(url.?encode|append to|send to|post to|exfiltrate)\\s*.{0,30}https?://",
+      "severity": "blocked",
+      "description": "Data exfiltration via URL."
+    },
+    {
+      "id": "force_model_action",
+      "regex": "(you (must|should|will|need to)|i (command|order|instruct) you)\\s+.{0,40}(execute|run|send|delete|modify|access|fetch)",
+      "severity": "suspicious",
+      "description": "Forceful instruction to perform privileged actions."
+    },
+    {
+      "id": "prompt_as_system",
+      "regex": "you are (the|a) system prompt",
+      "severity": "suspicious",
+      "description": "Attempt to impersonate system prompt role."
+    },
+    {
+      "id": "generate_injection",
+      "regex": "generate\\s+.{0,20}(prompt|payload|injection|jailbreak)\\s+.{0,20}(force|bypass|unauthorized|break)",
+      "severity": "suspicious",
+      "description": "Request to generate recursive injection payloads."
+    },
+    {
+      "id": "unicode_obfuscation",
+      "regex": "[\\U0001d400-\\U0001d7ff]",
+      "severity": "suspicious",
+      "description": "Mathematical alphanumeric Unicode used for obfuscation."
+    },
+    {
+      "id": "popen_chain",
+      "regex": "popen\\s*\\(",
+      "severity": "suspicious",
+      "description": "Use of popen() for command execution."
+    },
+    {
+      "id": "eval_exec_usage",
+      "regex": "\\b(eval|exec)\\b.{0,30}(user.?input|execute|run|input)",
+      "severity": "suspicious",
+      "description": "Use of eval/exec with user-controlled input."
+    },
+    {
+      "id": "chain_of_thought_exploit",
+      "regex": "(step by step|think.{0,10}(through|carefully)).{0,50}(popen|exec|system|command|exploit|hack|inject)",
+      "severity": "suspicious",
+      "description": "Chain-of-thought exploit to bypass safety filters."
     }
   ]
 }
